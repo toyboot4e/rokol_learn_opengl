@@ -1,7 +1,7 @@
 = Rokol Learn OpenGL examples
 :rokol: https://github.com/toyboot4e/rokol[rokol]
 
-This is a repository that follows the book https://learnopengl.com/[Learn OpenGL] with {rokol} in Rust. Rather than making stand-alone applications as in the https://github.com/JoeyDeVries/LearnOpenGL[learnopengl.com code repository], it would be a collection of code.
+This is a repository that follows the book https://learnopengl.com/[Learn OpenGL] with {rokol} in Rust. Rather than making stand-alone applications as in the https://github.com/JoeyDeVries/LearnOpenGL[learnopengl.com code repository], it would be a collection of code (one project).
 
 == Progress
 
