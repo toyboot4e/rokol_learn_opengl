@@ -13,14 +13,14 @@ fn main() -> rokol::Result {
     // give implementation to log crate
     env_logger::init();
 
-    let rokol = rokol::Rokol {
+    let desc = rokol::Rokol {
         w: 1280,
         h: 720,
         title: "Rokol Learn OpenGL examples".to_string(),
         ..Default::default()
     };
 
-    rokol_learn_opengl::run(rokol, |_rokol| AppData::new())
+    rokol::run(desc, |_rokol| AppData::new())
 }
 
 #[derive(Debug)]
