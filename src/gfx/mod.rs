@@ -1,3 +1,7 @@
+/*!
+Higher-level objects on [`rokol::gfx`]
+*/
+
 mod mesh;
 mod shader;
 

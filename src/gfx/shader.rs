@@ -1,5 +1,6 @@
 use rokol::gfx::{self as rg, BakedResource};
 
+/// [`rg::Shader`] + [`rg::Pipeline`] with methods
 #[derive(Debug)]
 pub struct Shader {
     shd: rg::Shader,

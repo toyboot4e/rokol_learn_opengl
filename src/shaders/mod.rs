@@ -84,3 +84,48 @@ macro_rules! ub {
         block
     }};
 }
+
+/// (position, color) vertex
+#[derive(Debug, Clone)]
+#[repr(C)]
+pub struct TriangleVertex {
+    /// X, Y, Z
+    pos: [f32; 3],
+    /// R, G, B, A
+    color: [f32; 4],
+}
+
+impl TriangleVertex {
+    pub fn layout_desc() -> rg::LayoutDesc {
+        let mut desc = rg::LayoutDesc::default();
+        desc.attrs[0].format = rg::VertexFormat::Float3 as u32;
+        desc.attrs[1].format = rg::VertexFormat::UByte4 as u32;
+        desc
+    }
+}
+
+impl<T, U> From<(T, U)> for TriangleVertex
+where
+    T: Into<[f32; 3]>,
+    U: Into<[f32; 4]>,
+{
+    fn from(data: (T, U)) -> Self {
+        Self {
+            pos: data.0.into(),
+            color: data.1.into(),
+        }
+    }
+}
+
+pub fn triangle() -> Shader {
+    gen(
+        &def_shd!("triangle"),
+        |_shd| {},
+        &mut rg::PipelineDesc {
+            index_type: rg::IndexType::UInt16 as u32,
+            layout: TriangleVertex::layout_desc(),
+            cull_mode: rg::CullMode::None as u32,
+            ..Default::default()
+        },
+    )
+}

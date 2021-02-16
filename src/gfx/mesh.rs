@@ -1,7 +1,3 @@
-/*!
-RAII object with fluent API to [`rokol::gfx::Bindings`], i.e, vertex/index buffers and image slots
-*/
-
 use {
     rokol::gfx::{self as rg, BakedResource},
     std::marker::PhantomData,
@@ -26,12 +22,12 @@ impl<V> StaticMesh<V> {
     fn new<T>(verts: &[V], indices: &[T]) -> Self {
         Self {
             bind: rg::Bindings {
-                index_buffer: rg::Buffer::create(&rg::ibuf_desc_immutable(indices, "")),
                 vertex_buffers: {
                     let mut xs = [Default::default(); 8];
                     xs[0] = rg::Buffer::create(&rg::vbuf_desc_immutable(verts, ""));
                     xs
                 },
+                index_buffer: rg::Buffer::create(&rg::ibuf_desc_immutable(indices, "")),
                 ..Default::default()
             },
             n_indices: indices.len(),
@@ -55,7 +51,7 @@ impl<V> StaticMesh<V> {
     }
 
     /// Draws all the elements
-    pub fn draw(&self) {
+    pub fn draw_all(&self) {
         rg::apply_bindings(&self.bind);
         rg::draw(0, self.n_indices as u32, 1);
     }
@@ -64,9 +60,9 @@ impl<V> StaticMesh<V> {
 /// Dynamic buffers
 #[derive(Debug, Clone, Default)]
 pub struct DynamicMesh<V> {
-    pub bind: rg::Bindings,
-    pub n_indices: usize,
-    pub verts: Vec<V>,
+    bind: rg::Bindings,
+    n_indices: usize,
+    verts: Vec<V>,
     _phantom: PhantomData<V>,
 }
 
@@ -82,7 +78,6 @@ impl<V> DynamicMesh<V> {
         let mut b = rg::Bindings::default();
 
         let size_in_bytes = std::mem::size_of::<V>() * verts.len();
-        log::trace!("mesh size: {}", size_in_bytes);
         b.vertex_buffers[0] = rg::Buffer::create(&rg::vbuf_desc_dyn(
             size_in_bytes,
             rg::ResourceUsage::Stream,
