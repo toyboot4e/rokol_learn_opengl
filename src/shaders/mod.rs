@@ -6,7 +6,8 @@ Be sure to set uniform names (orelse, it fails or the order of uniforms would be
 
 #![allow(unused)]
 
-use rokol::gfx::{self as rg, BakedResource, Shader};
+use crate::gfx::Shader;
+use rokol::gfx::{self as rg, BakedResource};
 
 /// Shorthand for specifying shader files
 macro_rules! def_shd {
