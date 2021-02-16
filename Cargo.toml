@@ -9,4 +9,5 @@ rokol = { git = "https://github.com/toyboot4e/rokol", branch = "master", feature
 
 log = "0.4.14"
 env_logger = "0.8.3"
+image = "0.23.13"
 
