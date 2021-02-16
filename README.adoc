@@ -1,0 +1,29 @@
+= Rokol Learn OpenGL examples
+:rokol: https://github.com/toyboot4e/rokol[rokol]
+
+This is a repository that follows the book https://learnopengl.com/[Learn OpenGL] with {rokol} in Rust. Rather than making stand-alone applications as in the https://github.com/JoeyDeVries/LearnOpenGL[learnopengl.com code repository], it would be a collection of code.
+
+== Progress
+
+Follow the book:
+
+* [ ] Ch. 1 Getting started
+* [ ] Ch. 2 Ligthing
+* [ ] Ch. 3 Model loading
+* [ ] Ch. 4 Advanced OpenGL
+* [ ] Ch. 5 Advanced lighting
+* [ ] Ch. 6 PBR
+
+Meta:
+
+* [ ] Using sokol-shdc in https://github.com/floooh/sokol-tools[sokol-tools]
+* [ ] Using SDL2 for application window
+
+== References
+
+* https://learnopengl.com/[Learn OpenGL]
+* https://github.com/floooh/sokol[Sokol]
+* https://floooh.github.io/[The Brain Dump]
+* https://www.geertarien.com/learnopengl-examples-html5/[Learn OpenGL Examples] (with Sokol) https://github.com/GeertArien/learnopengl-examples[repository]
+* https://github.com/prime31/zig-renderkit[zig-renderkit] and https://github.com/prime31/zig-gamekit[zig-gamekita]
+
