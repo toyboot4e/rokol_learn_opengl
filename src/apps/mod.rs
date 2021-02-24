@@ -4,5 +4,8 @@ Implementations of [`rokol::app::RApp`]
 Just a showcase.
 */
 
-pub mod texture;
-pub mod triangle;
+mod cube;
+mod texture;
+mod triangle;
+
+pub use self::{cube::CubeApp, texture::TextureApp, triangle::TriangleApp};

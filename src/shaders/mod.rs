@@ -125,7 +125,7 @@ pub fn triangle() -> Shader {
         &mut rg::PipelineDesc {
             index_type: rg::IndexType::UInt16 as u32,
             layout: TriangleVertex::layout_desc(),
-            cull_mode: rg::CullMode::None as u32,
+            // cull_mode: rg::CullMode::None as u32,
             ..Default::default()
         },
     )
@@ -189,6 +189,52 @@ pub fn texture() -> Shader {
                 index_type: rg::IndexType::UInt16 as u32,
                 layout: TextureVertex::layout_desc(),
                 cull_mode: rg::CullMode::None as u32,
+                ..Default::default()
+            };
+            // pip.colors[0].blend = ALPHA_BLEND;
+            pip
+        },
+    )
+}
+
+#[derive(Debug, Clone)]
+#[repr(C)]
+pub struct CubeVertex {
+    /// X, Y, Z
+    pos: [f32; 3],
+    /// R, G, B, A
+    color: [u8; 4],
+    /// u, v (texture coordinates)
+    uv: [f32; 2],
+}
+
+impl<Pos, Color, Uv> From<(Pos, Color, Uv)> for CubeVertex
+where
+    Pos: Into<[f32; 3]>,
+    Color: Into<[u8; 4]>,
+    Uv: Into<[f32; 2]>,
+{
+    fn from(data: (Pos, Color, Uv)) -> Self {
+        Self {
+            pos: data.0.into(),
+            color: data.1.into(),
+            uv: data.2.into(),
+        }
+    }
+}
+
+pub fn cube() -> Shader {
+    gen(
+        &def_shd!("cube"),
+        |shd| {
+            shd.fs.images[0] = img_type!("tex", rg::ImageType::Dim2);
+            shd.vs.uniform_blocks[0] = ub!("mvp", rg::UniformType::Mat4, glam::Mat4);
+        },
+        &mut {
+            let mut pip = rg::PipelineDesc {
+                index_type: rg::IndexType::UInt16 as u32,
+                layout: TextureVertex::layout_desc(),
+                cull_mode: rg::CullMode::Back as u32,
                 ..Default::default()
             };
             // pip.colors[0].blend = ALPHA_BLEND;

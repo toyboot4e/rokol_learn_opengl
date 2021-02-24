@@ -2,7 +2,7 @@
 Learn OpenGL Rokol examples
 */
 
-use rokol_learn_opengl::apps::texture::TextureApp as AppData;
+use rokol_learn_opengl::apps::CubeApp as AppData;
 
 fn main() -> rokol::Result {
     // give implementation to log crate
