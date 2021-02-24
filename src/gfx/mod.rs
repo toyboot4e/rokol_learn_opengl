@@ -1,7 +1,5 @@
 /*!
-Higher-level objects on [`rokol::gfx`]
-
-They clear resource on `drop` and wrap `rokol` functions in methods.
+RAII objects on [`rokol::gfx`]
 */
 
 mod mesh;
@@ -10,4 +8,4 @@ mod tex;
 
 pub use mesh::{DynamicMesh, StaticMesh};
 pub use shader::Shader;
-pub use tex::{RenderTexture2d, Texture2dDrop};
+pub use tex::{RenderTexture2d, Texture2dDrop, TextureBuilder};

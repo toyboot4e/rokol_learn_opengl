@@ -1,53 +1,40 @@
 use {
     image::GenericImageView,
     rokol::gfx::{self as rg, BakedResource},
-    std::path::Path,
+    std::{borrow::Cow, path::Path},
 };
 
 /// Image loading result
 pub type Result<T> = image::ImageResult<T>;
 
-/// Owned or borrowed pixels (specific `Cow` for `TextureBuilder`)
-#[derive(Debug)]
-enum Pixels<'a> {
-    /// Owned pixels loaded from storage or memory
-    Dyn(image::DynamicImage),
-    /// Borrowed pixels loaded from memory
-    Static(&'a [u8]),
-}
-
-impl<'a> Pixels<'a> {
-    pub fn as_bytes(&'a self) -> &'a [u8] {
-        match self {
-            Self::Dyn(img) => img.as_bytes(),
-            Self::Static(bytes) => bytes,
-        }
-    }
-}
-
 #[derive(Debug)]
 pub struct TextureBuilder<'a> {
-    pixels: Pixels<'a>,
+    pixels: Cow<'a, [u8]>,
     size: [u32; 2],
-    pub filter: rg::Filter,
-    pub wrap: rg::Wrap,
+    filter: rg::Filter,
+    wrap: rg::Wrap,
 }
 
 impl TextureBuilder<'static> {
     pub fn from_path(path: &Path) -> Result<Self> {
-        let img = image::open(path)?;
-        Ok(Self::from_dyn_img(img))
+        Ok(Self::from_dyn_img(image::open(path)?))
     }
 
     pub fn from_encoded_bytes(mem: &[u8]) -> Result<Self> {
-        let img = image::load_from_memory(mem)?;
-        Ok(Self::from_dyn_img(img))
+        Ok(Self::from_dyn_img(image::load_from_memory(mem)?))
     }
 
     fn from_dyn_img(img: image::DynamicImage) -> Self {
         let size = [img.width(), img.height()];
+
+        // [OpenGL] invert vertically
+        let img = img.flipv();
+
+        // NOTE: It can be, for example, RGB8 image
+        let img: Vec<u8> = img.into_rgba8().into_raw();
+
         Self {
-            pixels: Pixels::Dyn(img),
+            pixels: Cow::from(img),
             size,
             filter: rg::Filter::Linear,
             wrap: rg::Wrap::ClampToEdge,
@@ -58,25 +45,10 @@ impl TextureBuilder<'static> {
 impl<'a> TextureBuilder<'a> {
     pub fn from_pixels(pixels: &'a [u8], w: u32, h: u32) -> Self {
         Self {
-            pixels: Pixels::Static(pixels),
+            pixels: Cow::from(pixels),
             size: [w, h],
             filter: rg::Filter::Linear,
             wrap: rg::Wrap::ClampToEdge,
-        }
-    }
-
-    fn img_desc(&self) -> rg::ImageDesc {
-        let pixels = self.pixels.as_bytes();
-        rg::ImageDesc {
-            type_: rg::ImageType::Dim2 as u32,
-            width: self.size[0] as i32,
-            height: self.size[1] as i32,
-            min_filter: self.filter as u32,
-            mag_filter: self.filter as u32,
-            wrap_u: self.wrap as u32,
-            wrap_v: self.wrap as u32,
-            wrap_w: self.wrap as u32,
-            ..Default::default()
         }
     }
 
@@ -89,15 +61,35 @@ impl<'a> TextureBuilder<'a> {
         self.wrap = wrap;
         self
     }
+
+    pub fn build_texture(&self) -> Texture2dDrop {
+        Texture2dDrop {
+            img: rg::Image::create(&{
+                let mut desc = self::img_desc(self.size[0], self.size[1], self.filter, self.wrap);
+                desc.render_target = false;
+                desc.usage = rg::ResourceUsage::Immutable as u32;
+                desc.data.subimage[0][0] = self.pixels.as_ref().into();
+                desc
+            }),
+            w: self.size[0],
+            h: self.size[1],
+        }
+    }
 }
 
-// fn image_desc(pixels: &[u8], w: u32, h: u32, filter: rg::Filter, wrap: rg::Wrap) -> rg::ImageDesc {
-//     let mut desc = image_desc_2d(w, h, filter, wrap);
-//     desc.render_target = false;
-//     desc.usage = rg::ResourceUsage::Immutable as u32;
-//     desc.data.subimage[0][0] = pixels.into();
-//     desc
-// }
+fn img_desc(w: u32, h: u32, filter: rg::Filter, wrap: rg::Wrap) -> rg::ImageDesc {
+    rg::ImageDesc {
+        type_: rg::ImageType::Dim2 as u32,
+        width: w as i32,
+        height: h as i32,
+        min_filter: filter as u32,
+        mag_filter: filter as u32,
+        wrap_u: wrap as u32,
+        wrap_v: wrap as u32,
+        wrap_w: wrap as u32,
+        ..Default::default()
+    }
+}
 
 // fn target_desc(w: u32, h: u32, filter: rg::Filter, wrap: rg::Wrap) -> rg::ImageDesc {
 //     let mut desc = image_desc_2d(w, h, filter, wrap);
@@ -132,15 +124,23 @@ impl Drop for Texture2dDrop {
 }
 
 impl Texture2dDrop {
+    /// Prefer to use [`TextureBuilder`]
+    pub fn new(img: rg::Image, w: u32, h: u32) -> Self {
+        Self { img, w, h }
+    }
+
     pub fn w(&self) -> u32 {
         self.w
     }
+
     pub fn h(&self) -> u32 {
-        self.w
+        self.h
     }
+
     pub fn size(&self) -> [u32; 2] {
         [self.w, self.h]
     }
+
     pub fn img(&self) -> rg::Image {
         self.img
     }

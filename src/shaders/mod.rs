@@ -1,13 +1,14 @@
 /*!
 Shaders
 
-Be sure to set uniform names (orelse, it fails or the order of uniforms would be borken).
+Be sure to set uniform names (or else, it fails or the order of uniforms would be broken).
 */
 
 #![allow(unused)]
 
-use crate::gfx::Shader;
 use rokol::gfx::{self as rg, BakedResource};
+
+use crate::gfx::Shader;
 
 /// Shorthand for specifying shader files
 macro_rules! def_shd {
@@ -99,7 +100,7 @@ impl TriangleVertex {
     pub fn layout_desc() -> rg::LayoutDesc {
         let mut desc = rg::LayoutDesc::default();
         desc.attrs[0].format = rg::VertexFormat::Float3 as u32;
-        desc.attrs[1].format = rg::VertexFormat::UByte4 as u32;
+        desc.attrs[1].format = rg::VertexFormat::Float4 as u32;
         desc
     }
 }
@@ -126,6 +127,72 @@ pub fn triangle() -> Shader {
             layout: TriangleVertex::layout_desc(),
             cull_mode: rg::CullMode::None as u32,
             ..Default::default()
+        },
+    )
+}
+
+/// (position, color) vertex
+#[derive(Debug, Clone)]
+#[repr(C)]
+pub struct TextureVertex {
+    // /// X, Y, Z
+    pub pos: [f32; 3],
+    // /// R, G, B, A
+    pub color: [u8; 4],
+    // /// u, v
+    pub uv: [f32; 2],
+}
+
+impl TextureVertex {
+    pub fn layout_desc() -> rg::LayoutDesc {
+        let mut desc = rg::LayoutDesc::default();
+        desc.attrs[0].format = rg::VertexFormat::Float3 as u32;
+        desc.attrs[1].format = rg::VertexFormat::UByte4N as u32;
+        desc.attrs[2].format = rg::VertexFormat::Float2 as u32;
+        desc
+    }
+}
+
+impl<T, U, V> From<(T, U, V)> for TextureVertex
+where
+    T: Into<[f32; 3]>,
+    U: Into<[u8; 4]>,
+    V: Into<[f32; 2]>,
+{
+    fn from(data: (T, U, V)) -> Self {
+        Self {
+            pos: data.0.into(),
+            color: data.1.into(),
+            uv: data.2.into(),
+        }
+    }
+}
+
+const ALPHA_BLEND: rg::BlendState = rg::BlendState {
+    enabled: true,
+    src_factor_rgb: rg::BlendFactor::SrcAlpha as u32,
+    dst_factor_rgb: rg::BlendFactor::OneMinusSrcAlpha as u32,
+    op_rgb: 0,
+    src_factor_alpha: rg::BlendFactor::One as u32,
+    dst_factor_alpha: rg::BlendFactor::Zero as u32,
+    op_alpha: 0,
+};
+
+pub fn texture() -> Shader {
+    gen(
+        &def_shd!("texture"),
+        |shd| {
+            shd.fs.images[0] = img_type!("tex", rg::ImageType::Dim2);
+        },
+        &mut {
+            let mut pip = rg::PipelineDesc {
+                index_type: rg::IndexType::UInt16 as u32,
+                layout: TextureVertex::layout_desc(),
+                cull_mode: rg::CullMode::None as u32,
+                ..Default::default()
+            };
+            // pip.colors[0].blend = ALPHA_BLEND;
+            pip
         },
     )
 }
