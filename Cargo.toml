@@ -5,10 +5,11 @@ authors = ["toyboot4e <toyboot4e@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-rokol = { git = "https://github.com/toyboot4e/rokol", features = ["glcore33"] }
+rokol = { git = "https://github.com/toyboot4e/rokol", features = ["glcore33", "impl-gfx", "impl-app"] }
 
 log = "0.4.14"
 env_logger = "0.8.3"
+
 image = "0.23.13"
 glam = "0.12.0"
 

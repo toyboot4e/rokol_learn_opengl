@@ -1,5 +1,5 @@
 /*!
-RAII objects on [`rokol::gfx`]
+RAII graphics objects on [`rokol::gfx`]
 */
 
 mod mesh;

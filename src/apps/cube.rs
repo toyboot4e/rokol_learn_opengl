@@ -103,7 +103,7 @@ impl rokol::app::RApp for CubeApp {
             // let rot_y = glam::Mat4::rotate(ry, [0.0f, 1.0f, 0.0f]);
             // let model = rot_x * rot_y;
 
-            // left-handed matrices
+            // right-handed matrices
             let view = Mat4::look_at_rh(
                 // camera position
                 [2.0, 2.0, 4.0].into(),

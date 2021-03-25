@@ -1,3 +1,7 @@
+/*!
+TODO: maybe recommend bytemuck for `as_bytes`
+*/
+
 use rokol::gfx::{self as rg, BakedResource};
 
 /// [`rg::Shader`] + [`rg::Pipeline`] with methods

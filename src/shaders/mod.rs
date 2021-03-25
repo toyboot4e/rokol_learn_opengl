@@ -42,7 +42,7 @@ macro_rules! embed_shd {
     };
 }
 
-/// Generates [`rg::Shader`]
+/// Generates [`Shader`]
 fn gen(
     vs_fs: &[impl AsRef<str>; 2],
     mut_shd_desc: impl Fn(&mut rg::ShaderDesc),
